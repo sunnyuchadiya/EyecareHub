@@ -1,4 +1,4 @@
-# 👁️ EyeCareHub - E-Commerce Platform
+# 👁️ EyeCareHub 
 
 A full-stack e-commerce web application for eyewear products built with **Spring Boot** and **MongoDB**. Features JWT authentication, role-based access control, shopping cart, order management, and an admin dashboard.
 
