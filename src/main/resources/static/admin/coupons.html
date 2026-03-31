@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Coupons - EyeCareHub Admin</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" href="css/admin.css?v=8">
+    <style>
+        #coupon-modal .modal-content {
+            overflow-x: hidden;
+        }
+
+        #coupon-modal .coupon-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        #coupon-modal input[type="datetime-local"] {
+            width: 100% !important;
+            min-width: 0;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 10px !important;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: clip;
+        }
+
+        #coupon-modal input[type="datetime-local"]::-webkit-outer-spin-button,
+        #coupon-modal input[type="datetime-local"]::-webkit-inner-spin-button {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #coupon-modal .coupon-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            #coupon-modal input[type="datetime-local"] {
+                font-size: 0.85rem;
+                padding: 8px !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="background: #0a0a0a;">
+
+    <aside class="admin-sidebar">
+        <a href="../index.html" class="admin-logo">EyeCareHub</a>
+        <nav class="admin-nav">
+            <a href="index.html" class="admin-nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+            <a href="users.html" class="admin-nav-item"><i class="fa-solid fa-users"></i> Users</a>
+            <a href="products.html" class="admin-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+            <a href="orders.html" class="admin-nav-item"><i class="fa-solid fa-receipt"></i> Orders</a>
+            <a href="coupons.html" class="admin-nav-item active"><i class="fa-solid fa-ticket"></i> Coupons</a>
+            <a href="settings.html" class="admin-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1 class="admin-title">Coupons</h1>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn-clean" onclick="openAddCouponModal()"
+                    style="padding: 10px 20px; font-size: 0.9rem; background: var(--accent-color); color: #000; border: none;">
+                    <i class="fa-solid fa-plus"></i> Add Coupon
+                </button>
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="search-filter-container">
+            <div class="input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="coupon-search" type="text" placeholder="Search by coupon code..." class="premium-input">
+            </div>
+            <div class="input-wrapper">
+                <select id="coupon-status-filter" class="premium-input premium-select">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Expired">Expired</option>
+                    <option value="Used Up">Used Up</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Discount</th>
+                        <th>Usage</th>
+                        <th>Start Date</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="coupons-table-body">
+                    <!-- JS Injected -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div class="modal-backdrop" id="coupon-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeCouponModal()"><i class="fa-solid fa-xmark"></i></span>
+            <h2 id="coupon-modal-title" style="margin-bottom: 20px;">Add New Coupon</h2>
+
+            <form id="coupon-form">
+                <input type="hidden" id="coupon-id">
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">Coupon Code</label>
+                    <input type="text" id="coupon-code" class="form-input"
+                        style="width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 8px;"
+                        placeholder="WELCOME100" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">Discount Amount (₹)</label>
+                    <input type="number" id="coupon-discount" class="form-input"
+                        style="width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 8px;"
+                        min="1" required>
+                </div>
+
+                <div class="form-group coupon-grid" style="margin-bottom: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px;">Max Uses</label>
+                        <input type="number" id="coupon-max-uses" class="form-input"
+                            style="width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 8px;"
+                            min="1" value="1" required>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px;">Used Count</label>
+                        <input type="number" id="coupon-used-count" class="form-input"
+                            style="width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 8px;"
+                            min="0" value="0" required>
+                      
+                    </div>
+                </div>
+
+                <div class="form-group coupon-grid" style="margin-bottom: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 5px;">Start Date</label>
+                        <input type="datetime-local" id="coupon-start-date" class="form-input"
+                            style="width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 8px;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 5px;">Expiry Date</label>
+                        <input type="datetime-local" id="coupon-expiry-date" class="form-input"
+                            style="width: 100%; padding: 10px; background: #222; border: 1px solid #333; color: #fff; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="coupon-active" checked>
+                    <label for="coupon-active">Coupon Active</label>
+                </div>
+
+                <button type="submit"
+                    style="width: 100%; background: var(--accent-color); padding: 12px; border: none; font-weight: 700; cursor: pointer; border-radius: 8px;">Save
+                    Coupon</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="js/admin.js?v=10"></script>
+    <script src="../js/cursor.js"></script>
+</body>
+
+</html>
