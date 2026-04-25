@@ -16,6 +16,14 @@ EyeCareHub is a modern e-commerce solution designed for selling eyewear products
 
 ---
 
+## 📌 Recent Update (April 25, 2026)
+
+- Refreshed project documentation for easier onboarding.
+- Revalidated local run flow for Java 25 + Spring Boot + MongoDB setup.
+- Clarified quick-access URLs for frontend, admin panel, and API base.
+
+---
+
 ## 🚀 Features
 
 ### 🛍️ Customer Features
@@ -422,7 +430,7 @@ For support, email sunny130504@gmail.com or open an issue on GitHub.
 
 ---
 
-**Last Updated**: March 31, 2026
+**Last Updated**: April 25, 2026
 **Status**: Active Development ✅
    - Admin Panel: http://localhost:8080/admin/
    - API Base URL: http://localhost:8080/api
