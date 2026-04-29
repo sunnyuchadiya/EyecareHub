@@ -25,8 +25,9 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> placeOrder(@RequestParam String paymentType) {
-        return ResponseEntity.ok(orderService.placeOrder(getCurrentUserId(), paymentType));
+    public ResponseEntity<Order> placeOrder(@RequestParam String paymentType,
+                                            @RequestParam(required = false) String couponCode) {
+        return ResponseEntity.ok(orderService.placeOrder(getCurrentUserId(), paymentType, couponCode));
     }
 
     @GetMapping

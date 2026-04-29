@@ -4,33 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Orders - NEXUS Admin</title>
+    <title>Manage Orders - EyeCareHub Admin</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin.css?v=7">
 </head>
 
 <body style="background: #0a0a0a;">
 
     <aside class="admin-sidebar">
-        <a href="../index.html" class="admin-logo">NEXUS<span style="color: var(--accent-color);">.</span></a>
+        <a href="../index.html" class="admin-logo">EyeCareHub</a>
         <nav class="admin-nav">
             <a href="index.html" class="admin-nav-item"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
             <a href="users.html" class="admin-nav-item"><i class="fa-solid fa-users"></i> Users</a>
             <a href="products.html" class="admin-nav-item"><i class="fa-solid fa-box"></i> Products</a>
             <a href="orders.html" class="admin-nav-item active"><i class="fa-solid fa-receipt"></i> Orders</a>
+            <a href="coupons.html" class="admin-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
             <a href="settings.html" class="admin-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
         </nav>
     </aside>
 
     <main class="admin-main">
         <header class="admin-header">
-            <h1 class="admin-title">Orders</h1>
-            <div style="color: #888;">Manage and track customer orders</div>
+            <div>
+                <h1 class="admin-title">Orders</h1>
+                <div style="color: #888;">Manage and track customer orders</div>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">
+                <i class="fa-solid fa-sign-out-alt"></i> Logout
+            </button>
         </header>
+
+        <div class="search-filter-container">
+            <div class="input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="order-search" type="text" placeholder="Search orders by ID or Customer ID..." class="premium-input">
+            </div>
+            <div class="input-wrapper">
+                <select id="order-status-filter" class="premium-input premium-select">
+                    <option value="">All Statuses</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="PROCESSING">Processing</option>
+                    <option value="SHIPPED">Shipped</option>
+                    <option value="DELIVERED">Delivered</option>
+                    <option value="CANCELLED">Cancelled</option>
+                </select>
+            </div>
+        </div>
 
         <div class="data-table-wrapper">
             <table class="data-table">
@@ -51,8 +74,8 @@
         </div>
     </main>
 
-    <script src="../js/data.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="js/admin.js?v=10"></script>
     <script src="../js/cursor.js"></script>
 </body>
 

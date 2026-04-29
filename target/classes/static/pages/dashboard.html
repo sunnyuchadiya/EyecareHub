@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account - NEXUS</title>
+    <title>My Account - EyeCareHub</title>
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
     <!-- Nav -->
     <nav class="navbar">
         <div class="container nav-container">
-            <a href="../index.html" class="logo">NEXUS<span class="text-accent">.</span></a>
+            <a href="../index.html" class="logo">EyeCareHub</a>
 
             <ul class="nav-links desktop-only">
                 <li><a href="../index.html" class="nav-link">Home</a></li>
@@ -97,7 +97,8 @@
                         <input type="tel" class="form-input" id="editPhone">
                     </div>
                     <div class="full-width">
-                        <button type="button" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+                        <div id="profile-save-msg" style="margin-top: 10px; font-size: 0.9rem;"></div>
                     </div>
                 </form>
             </div>
@@ -105,17 +106,7 @@
             <!-- Address Tab -->
             <div id="address" class="dash-tab hidden">
                 <h2 class="section-title">Saved Addresses</h2>
-                <div class="order-card">
-                    <div style="margin-bottom: 10px;">
-                        <strong>Home</strong> <span
-                            style="font-size: 0.8rem; background: #333; padding: 2px 6px; border-radius: 4px; margin-left: 10px;">Default</span>
-                    </div>
-                    <p style="color: #aaa; font-size: 0.9rem;">123 Tech Street, Silicon Valley, CA 94000</p>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-outline btn-sm">Edit</button>
-                        <button class="remove-btn" style="margin-left: 15px;">Delete</button>
-                    </div>
-                </div>
+                <div id="address-list"></div>
                 <button class="btn btn-primary btn-sm" onclick="openAddressModal()"><i class="fa-solid fa-plus"></i> Add
                     New Address</button>
             </div>
@@ -126,15 +117,60 @@
     <footer>
         <div class="container">
             <div style="text-align: center; color: #666; font-size: 0.9rem;">
-                <p>&copy; 2026 NEXUS Inc.</p>
+                <p>&copy; 2026 EyeCareHub Inc.</p>
             </div>
         </div>
     </footer>
 
+    <script src="../js/api.js"></script>
     <script src="../js/data.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/dashboard.js"></script>
+    <script src="../js/dashboard.js?v=5"></script>
     <script src="../js/cursor.js"></script>
+    <script>
+        // Inline saveProfile to bypass caching issues
+        window.saveProfile = function () {
+            var nameInput = document.getElementById('editName');
+            var phoneInput = document.getElementById('editPhone');
+            var msgEl = document.getElementById('profile-save-msg');
+
+            var name = nameInput ? nameInput.value.trim() : '';
+            if (!name) {
+                if (msgEl) { msgEl.innerText = 'Name cannot be empty.'; msgEl.style.color = '#ff7f7f'; }
+                return;
+            }
+
+            var user = {};
+            try { user = JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) {}
+            user.name = name;
+            user.username = name;
+            if (phoneInput) user.phone = phoneInput.value.trim();
+            localStorage.setItem('user', JSON.stringify(user));
+
+            var profileNameEl = document.getElementById('profileName');
+            var profileInitialsEl = document.getElementById('profileInitials');
+            if (profileNameEl) profileNameEl.innerText = name;
+            if (profileInitialsEl) profileInitialsEl.innerText = name.charAt(0).toUpperCase();
+
+            if (msgEl) {
+                msgEl.innerText = 'Profile saved successfully!';
+                msgEl.style.color = '#76d77d';
+                setTimeout(function() { msgEl.innerText = ''; }, 3000);
+            }
+            alert('Profile updated: ' + name);
+        };
+
+        // Wire up the button also via DOM in case onclick attr doesn't work
+        document.addEventListener('DOMContentLoaded', function () {
+            var btn = document.querySelector('#profile .btn-primary');
+            if (btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.saveProfile();
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

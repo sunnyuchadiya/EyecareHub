@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop - NEXUS</title>
+    <title>Shop - EyeCareHub</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,14 +48,19 @@
 
         .sidebar-section {
             margin-bottom: 30px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 18px 16px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
         }
 
         .sidebar-title {
             font-size: 1.1rem;
             margin-bottom: 15px;
             font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.3px;
         }
 
         .filter-group label {
@@ -63,17 +68,78 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 10px;
-            color: var(--text-muted);
+            color: #d0d0d0;
             cursor: pointer;
             font-size: 0.95rem;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+
+        .filter-group label:hover {
+            color: #fff;
+            border-color: rgba(219, 242, 39, 0.4);
+            background: rgba(219, 242, 39, 0.08);
         }
 
         .filter-group input[type="checkbox"] {
-            accent-color: var(--accent-color);
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.03);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .filter-group input[type="checkbox"]:checked {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+        }
+
+        .filter-group input[type="checkbox"]:checked::after {
+            content: '';
+            width: 8px;
+            height: 4px;
+            border-left: 2px solid #000;
+            border-bottom: 2px solid #000;
+            transform: rotate(-45deg) translate(1px, -1px);
         }
 
         .price-range {
             width: 100%;
+            appearance: none;
+            height: 8px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(219, 242, 39, 0.32), rgba(255, 255, 255, 0.12));
+            outline: none;
+            margin-top: 10px;
+        }
+
+        .price-range::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 2px solid #0a0a0a;
+            box-shadow: 0 0 0 5px rgba(219, 242, 39, 0.16);
+            cursor: pointer;
+        }
+
+        .price-range::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 2px solid #0a0a0a;
+            box-shadow: 0 0 0 5px rgba(219, 242, 39, 0.16);
+            cursor: pointer;
         }
 
         .sort-bar {
@@ -81,6 +147,50 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            gap: 12px;
+        }
+
+        #result-count {
+            color: #bdbdbd;
+            font-size: 0.95rem;
+        }
+
+        #sort {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            color: #fff !important;
+            padding: 10px 38px 10px 12px !important;
+            border-radius: 12px !important;
+            font-family: inherit;
+            font-size: 0.92rem;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg fill='%23dbf227' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            transition: var(--transition);
+        }
+
+        #sort:focus {
+            outline: none;
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 0 4px rgba(219, 242, 39, 0.14);
+        }
+
+        #sort option {
+            background: #111;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .sort-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #sort {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -168,15 +278,16 @@
     <footer>
         <div class="container">
             <div style="text-align: center; color: #666; font-size: 0.9rem;">
-                <p>&copy; 2026 NEXUS Inc.</p>
+                <p>&copy; 2026 EyeCareHub Inc.</p>
             </div>
         </div>
     </footer>
 
     <!-- App Scripts -->
+    <script src="../js/api.js"></script>
     <script src="../js/data.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/products.js"></script>
+    <script src="../js/products.js?v=2"></script>
     <script src="../js/cursor.js"></script>
 </body>
 

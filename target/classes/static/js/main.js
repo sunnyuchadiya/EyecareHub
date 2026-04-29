@@ -20,12 +20,16 @@ function initTheme() {
     // For now assuming we might add a toggle button or just expose function
     // Let's add a floating toggle for demo
     const toggle = document.createElement('button');
-    toggle.className = 'icon-btn';
+    toggle.className = 'icon-btn theme-toggle-btn';
+    toggle.id = 'theme-toggle-btn';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-label', 'Toggle theme');
     toggle.innerHTML = theme === 'light' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
     toggle.style.position = 'fixed';
     toggle.style.bottom = '20px';
     toggle.style.right = '20px';
     toggle.style.background = 'var(--bg-card)';
+    toggle.style.color = 'var(--text-main)';
     toggle.style.padding = '15px';
     toggle.style.borderRadius = '50%';
     toggle.style.zIndex = '9999';
@@ -58,6 +62,9 @@ function initSearch() {
     const triggers = document.querySelectorAll('.search-trigger'); // Add this class to nav search icon
     const close = modal.querySelector('.close-search');
     const input = modal.querySelector('searchInput');
+
+    // Just inject user icon since api.js is loaded statically
+    injectUserIcon();
 
     triggers.forEach(t => t.addEventListener('click', () => {
         modal.classList.add('active');
@@ -100,12 +107,73 @@ function initNavbar() {
     });
 }
 
-// Mock Cart Logic for badge
-function updateCartCount() {
+function injectUserIcon() {
+    const navIcons = document.querySelector('.nav-icons');
+    if (!navIcons) return;
+    
+    // Remove any existing hardcoded User icon to prevent duplicates
+    const existingIcons = navIcons.querySelectorAll('.icon-btn');
+    existingIcons.forEach(icon => {
+        if (icon.innerHTML.includes('fa-user')) {
+            icon.remove();
+        }
+    });
+
+    // Check if dynamic user icon already exists
+    if (document.getElementById('user-nav-action')) return;
+
+    const prefix = window.location.href.includes('/pages/') || window.location.href.includes('/admin/') ? '' : 'pages/';
+    
+    let linkHref = prefix + 'login.html';
+    let iconClass = 'fa-regular fa-user';
+    let label = 'Login';
+    
+    if (isAuthenticated()) {
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user.roles && user.roles.includes('ROLE_ADMIN')) {
+                    linkHref = window.location.href.includes('/pages/') ? '../admin/index.html' : window.location.href.includes('/admin/') ? 'index.html' : 'admin/index.html';
+                } else {
+                    linkHref = prefix + 'dashboard.html';
+                }
+            } catch(e) {}
+        } else {
+            label = 'Dashboard';
+            linkHref = prefix + 'dashboard.html';
+        }
+        iconClass = 'fa-solid fa-user';
+    }
+
+    const userLink = document.createElement('a');
+    userLink.href = linkHref;
+    userLink.className = 'icon-btn';
+    userLink.id = 'user-nav-action';
+    userLink.title = label;
+    userLink.innerHTML = `<i class="${iconClass}"></i>`;
+    
+    // Insert before search or cart
+    navIcons.insertBefore(userLink, navIcons.firstChild);
+}
+
+// API Cart Logic for badge
+async function updateCartCount() {
     const cartCount = document.getElementById('cart-count');
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    if (cartCount) {
-        cartCount.innerText = cart.reduce((acc, item) => acc + item.quantity, 0);
+    if (!cartCount) return;
+
+    if (typeof isAuthenticated !== 'undefined' && isAuthenticated()) {
+        try {
+            const cartResponse = await cartAPI.getCart();
+            const count = cartResponse.items ? cartResponse.items.reduce((acc, item) => acc + item.quantity, 0) : 0;
+            cartCount.innerText = count;
+        } catch (error) {
+            console.log('Error fetching cart:', error);
+            cartCount.innerText = '0';
+        }
+    } else {
+        // Fallback for non-logged in users ? They don't have a backend cart.
+        cartCount.innerText = '0';
     }
 }
 

@@ -1,4 +1,7 @@
 HELP.md
+
+# OAuth client secret files
+client_secret_*.json
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

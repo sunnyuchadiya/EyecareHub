@@ -39,6 +39,9 @@ public class AuthService {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    OTPService otpService;
+
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
         // Find user by email
         User user = userRepository.findByEmail(loginRequest.getEmail())
@@ -60,6 +63,8 @@ public class AuthService {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
+
+        // OTP verification skipped - direct login enabled
 
         return new JwtResponse(jwt,
                 userDetails.getId(),
@@ -101,6 +106,30 @@ public class AuthService {
         }
 
         user.setRoles(roles);
+        userRepository.save(user);
+
+        // OTP verification skipped - direct registration enabled
+    }
+
+    public void sendPasswordResetOTP(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            return;
+        }
+
+        otpService.generateAndSendOTP(email);
+    }
+
+    public void resetPassword(String email, String otp, String newPassword) {
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        otpService.verifyOTP(email, otp);
+
+        user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
     }
 }

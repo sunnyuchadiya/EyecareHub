@@ -1,6 +1,7 @@
 package com.EyeCareHub.service;
 
 import com.EyeCareHub.model.Cart;
+import com.EyeCareHub.model.Coupon;
 import com.EyeCareHub.model.Order;
 import com.EyeCareHub.repository.OrderRepository;
 import com.EyeCareHub.exception.ResourceNotFoundException;
@@ -19,18 +20,41 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private CouponService couponService;
+
     @Override
     @Transactional
-    public Order placeOrder(String userId, String paymentType) {
+    public Order placeOrder(String userId, String paymentType, String couponCode) {
         Cart cart = cartService.getCartByUserId(userId);
         if (cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
+        final double subtotal = cart.getTotalPrice() != null ? cart.getTotalPrice() : 0.0;
+        final double taxAmount = Math.round(subtotal * 0.18d);
+        final double amountBeforeDiscount = subtotal + taxAmount;
+
+        double discountAmount = 0.0;
+        String appliedCouponCode = null;
+
+        if (couponCode != null && !couponCode.trim().isEmpty()) {
+            Coupon coupon = couponService.getValidCouponOrThrow(couponCode.trim());
+            discountAmount = Math.min(amountBeforeDiscount, Math.max(0.0, coupon.getDiscountAmount()));
+            appliedCouponCode = coupon.getCode();
+            couponService.incrementUsage(coupon);
+        }
+
+        final double finalTotal = Math.max(0.0, amountBeforeDiscount - discountAmount);
+
         Order order = new Order(
                 userId,
                 cart.getItems(),
-                cart.getTotalPrice(),
+                subtotal,
+                taxAmount,
+                discountAmount,
+                finalTotal,
+                appliedCouponCode,
                 "PENDING",
                 paymentType
         );

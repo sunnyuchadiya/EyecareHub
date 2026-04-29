@@ -13,5 +13,6 @@ echo.
 echo Starting application...
 echo This may take 30-60 seconds...
 echo.
-mvn spring-boot:run -Dmaven.test.skip=true // ye command se run hoga 
+mvn spring-boot:run -Dmaven.test.skip=true
+
 pause

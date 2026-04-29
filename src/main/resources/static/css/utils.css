@@ -33,6 +33,26 @@ body.light-theme .product-card:hover {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* Keep nav and floating icons readable in light mode */
+body.light-theme .icon-btn {
+    color: var(--text-main);
+}
+
+body.light-theme .icon-btn:hover {
+    color: var(--accent-hover);
+}
+
+/* Dedicated floating theme toggle styles used on every page via main.js */
+.theme-toggle-btn {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+body.light-theme .theme-toggle-btn {
+    background: #ffffff !important;
+    color: #111111 !important;
+    border-color: #d5d5d5 !important;
+}
+
 /* Search Modal */
 .search-modal {
     position: fixed;

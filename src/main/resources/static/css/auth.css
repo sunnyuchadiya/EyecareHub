@@ -119,3 +119,46 @@
     cursor: pointer;
     color: var(--text-muted);
 }
+
+.password-toggle:hover {
+    color: var(--accent-color);
+}
+
+/* Google OAuth Button */
+.google-btn {
+    width: 100%;
+    padding: 14px;
+    background: rgba(66, 133, 244, 0.15);
+    border: 2px solid rgba(66, 133, 244, 0.4);
+    color: #4285f4;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: inherit;
+}
+
+.google-btn:hover {
+    background: rgba(66, 133, 244, 0.25);
+    border-color: rgba(66, 133, 244, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(66, 133, 244, 0.2);
+}
+
+.google-btn:active {
+    transform: translateY(0);
+}
+
+.google-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.google-btn i {
+    font-size: 1.2rem;
+}

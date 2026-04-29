@@ -4,11 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - NEXUS</title>
+    <title>Login - EyeCareHub</title>
 
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Styles -->
     <link rel="stylesheet" href="../css/style.css">
@@ -16,13 +19,56 @@
     <link rel="stylesheet" href="../css/utils.css">
     <link rel="stylesheet" href="../css/animations.css">
     <link rel="stylesheet" href="../css/antigravity.css">
+
+    <style>
+        .google-btn-custom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 13px 20px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.3px;
+        }
+        .google-btn-custom:hover {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(219,242,39,0.35);
+            box-shadow: 0 0 18px rgba(219,242,39,0.08);
+            transform: translateY(-1px);
+        }
+        .google-btn-custom:active {
+            transform: translateY(0);
+        }
+        .google-btn-custom .g-icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+        .google-btn-custom .btn-label {
+            flex: 1;
+            text-align: center;
+        }
+        .google-btn-custom.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body style="background: #0a0a0a;">
 
     <div class="auth-container">
         <div class="auth-card">
-            <div class="auth-logo">NEXUS<span class="text-accent">.</span></div>
+            <div class="auth-logo">EyeCareHub</div>
             <h2 class="auth-title">Welcome Back</h2>
 
             <form id="loginForm" novalidate>
@@ -45,11 +91,20 @@
                     <label style="display: flex; gap: 8px; cursor: pointer;">
                         <input type="checkbox" style="accent-color: var(--accent-color);"> Remember me
                     </label>
-                    <a href="#" style="color: var(--text-muted);">Forgot Password?</a>
+                    <a href="/pages/forgot-password.html" style="color: var(--text-muted);">Forgot Password?</a>
                 </div>
 
                 <button type="submit" class="auth-btn">Sign In</button>
             </form>
+
+            <div style="display: flex; align-items: center; margin: 25px 0; gap: 10px;">
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+                <span style="color: #888; font-size: 0.85rem;">OR</span>
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.1);"></div>
+            </div>
+
+            <!-- Official Google Sign-In Button -->
+            <div id="googleLoginBtnContainer" style="display:flex; justify-content:center;"></div>
 
             <div class="auth-footer">
                 Don't have an account? <a href="register.html">Sign up</a>
@@ -58,9 +113,64 @@
     </div>
 
     <script src="../js/data.js"></script>
+    <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/auth.js"></script>
+    <script src="../js/auth.js?v=10"></script>
     <script src="../js/cursor.js"></script>
+
+    <script>
+        const GOOGLE_CLIENT_ID = '321786605542-tu8tagojnb5pmggep1vgt040jg4k6lld.apps.googleusercontent.com';
+
+        // Google OAuth handler - inline to ensure it's always available
+        window.handleGoogleLoginResponse = async function(credentialResponse) {
+            try {
+                const backendResponse = await authAPI.googleLogin(credentialResponse.credential);
+                storeToken(backendResponse.token);
+                localStorage.setItem('user', JSON.stringify({
+                    id: backendResponse.id,
+                    username: backendResponse.username || backendResponse.email,
+                    email: backendResponse.email,
+                    roles: backendResponse.roles
+                }));
+                showSuccessMessage('Google login successful! Redirecting...');
+                setTimeout(() => {
+                    const isAdmin = backendResponse.roles && backendResponse.roles.includes('ROLE_ADMIN');
+                    window.location.href = isAdmin ? '../admin/index.html' : '../index.html';
+                }, 1000);
+            } catch (err) {
+                alert(err.message || 'Google login failed. Please try again.');
+            }
+        };
+
+        function initGoogleLoginButton() {
+            const container = document.getElementById('googleLoginBtnContainer');
+            if (!container) return;
+
+            if (!window.google || !window.google.accounts) {
+                setTimeout(initGoogleLoginButton, 300);
+                return;
+            }
+
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: window.handleGoogleLoginResponse,
+                auto_select: false,
+                cancel_on_tap_outside: true
+            });
+
+            container.innerHTML = '';
+            window.google.accounts.id.renderButton(container, {
+                theme: 'outline',
+                size: 'large',
+                text: 'continue_with',
+                shape: 'pill',
+                width: 320,
+                logo_alignment: 'left'
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initGoogleLoginButton);
+    </script>
 </body>
 
 </html>

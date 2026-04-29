@@ -218,3 +218,88 @@
     display: block;
     animation: fadeIn 0.5s ease;
 }
+
+#wishlist-btn.wishlist-active {
+    border-color: var(--accent-color) !important;
+    background: rgba(219, 242, 39, 0.12) !important;
+    color: var(--accent-color);
+}
+
+#wishlist-btn.wishlist-active i {
+    color: #ff557f;
+}
+
+.review-form {
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.review-form h4 {
+    margin-bottom: 12px;
+}
+
+.review-field-row {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.review-field-row label {
+    font-size: 0.9rem;
+    color: #c8c8c8;
+}
+
+.review-field-row select,
+.review-field-row textarea {
+    background: #121212;
+    color: #fff;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: inherit;
+}
+
+.review-field-row textarea {
+    resize: vertical;
+}
+
+.review-note {
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: #a9a9a9;
+    margin-bottom: 14px;
+}
+
+.review-card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+
+.review-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.review-stars {
+    color: #f8c537;
+    letter-spacing: 0.5px;
+}
+
+.review-comment {
+    color: #d0d0d0;
+    margin-bottom: 8px;
+}
+
+.review-date {
+    color: #909090;
+    font-size: 0.82rem;
+}

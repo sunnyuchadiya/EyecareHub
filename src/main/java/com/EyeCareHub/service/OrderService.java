@@ -4,7 +4,7 @@ import com.EyeCareHub.model.Order;
 import java.util.List;
 
 public interface OrderService {
-    Order placeOrder(String userId, String paymentType);
+    Order placeOrder(String userId, String paymentType, String couponCode);
     List<Order> getUserOrders(String userId);
     List<Order> getAllOrders();
     Order updateOrderStatus(String orderId, String status);

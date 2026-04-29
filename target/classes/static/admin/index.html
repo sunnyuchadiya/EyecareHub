@@ -4,27 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - NEXUS</title>
+    <title>Admin Dashboard - EyeCareHub</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin.css?v=7">
 </head>
 
 <body style="background: #0a0a0a;">
 
     <!-- Sidebar -->
     <aside class="admin-sidebar">
-        <a href="../index.html" class="admin-logo">NEXUS<span style="color: var(--accent-color);">.</span></a>
+        <a href="../index.html" class="admin-logo">EyeCareHub</a>
 
         <nav class="admin-nav">
             <a href="index.html" class="admin-nav-item active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
             <a href="users.html" class="admin-nav-item"><i class="fa-solid fa-users"></i> Users</a>
-            <a href="#" class="admin-nav-item"><i class="fa-solid fa-box"></i> Products</a>
-            <a href="#" class="admin-nav-item"><i class="fa-solid fa-receipt"></i> Orders</a>
-            <a href="#" class="admin-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
+            <a href="products.html" class="admin-nav-item"><i class="fa-solid fa-box"></i> Products</a>
+            <a href="orders.html" class="admin-nav-item"><i class="fa-solid fa-receipt"></i> Orders</a>
+            <a href="coupons.html" class="admin-nav-item"><i class="fa-solid fa-ticket"></i> Coupons</a>
+            <a href="settings.html" class="admin-nav-item"><i class="fa-solid fa-gear"></i> Settings</a>
         </nav>
 
         <div style="margin-top: auto; color: #666; font-size: 0.8rem; text-align: center;">
@@ -36,50 +37,124 @@
     <main class="admin-main">
         <header class="admin-header">
             <h1 class="admin-title">Dashboard</h1>
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <button class="action-btn"><i class="fa-solid fa-bell"></i></button>
-                <div style="width: 40px; height: 40px; background: #333; border-radius: 50%;"></div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="btn-logout" onclick="handleLogout()">
+                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                </button>
             </div>
         </header>
 
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Total Revenue</div>
-                <div class="stat-value" id="total-revenue">0</div>
-                <div style="color: var(--accent-color); font-size: 0.9rem;"><i class="fa-solid fa-arrow-up"></i> +12%
-                </div>
-            </div>
-            <div class="stat-card">
                 <div class="stat-label">Total Users</div>
                 <div class="stat-value" id="total-users">0</div>
-                <div style="color: var(--accent-color); font-size: 0.9rem;"><i class="fa-solid fa-arrow-up"></i> +5%
-                </div>
+                <div style="color: var(--accent-color); font-size: 0.9rem;"><i class="fa-solid fa-arrow-up"></i> Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Products</div>
+                <div class="stat-value" id="total-products">0</div>
+                <div style="color: var(--accent-color); font-size: 0.9rem;"><i class="fa-solid fa-arrow-up"></i> In Stock</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Total Orders</div>
                 <div class="stat-value" id="total-orders">0</div>
-                <div style="color: #888; font-size: 0.9rem;">Processing: 12</div>
+                <div style="color: #888; font-size: 0.9rem;">This Month</div>
             </div>
         </div>
 
-        <!-- Recent Activity Placeholder -->
-        <section>
+        <!-- System Status -->
+        <section class="dashboard-section">
             <h2 style="margin-bottom: 20px;">System Status</h2>
-            <div
-                style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
                 <p>All systems operational.</p>
                 <div style="height: 4px; background: #333; margin-top: 10px; border-radius: 2px; overflow: hidden;">
-                    <div
-                        style="width: 100%; height: 100%; background: var(--accent-color); animation: pulse-glow 2s infinite;">
-                    </div>
+                    <div style="width: 100%; height: 100%; background: var(--accent-color); animation: pulse-glow 2s infinite;"></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Recent Orders -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Orders</h2>
+                <a href="orders.html">View All →</a>
+            </div>
+            <div class="dashboard-table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-orders-container">
+                        <tr>
+                            <td colspan="5" class="empty-state">Loading orders...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Recent Users -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Users</h2>
+                <a href="users.html">View All →</a>
+            </div>
+            <div class="dashboard-table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-users-container">
+                        <tr>
+                            <td colspan="4" class="empty-state">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Top Products -->
+        <section class="dashboard-section" style="margin-bottom: 40px;">
+            <div class="section-header">
+                <h2>Top Products</h2>
+                <a href="products.html">View All →</a>
+            </div>
+            <div class="dashboard-table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-products-container">
+                        <tr>
+                            <td colspan="4" class="empty-state">Loading products...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
     </main>
 
-    <script src="../js/data.js"></script> <!-- Access shared data if needed -->
-    <script src="js/admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/data.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="js/admin.js?v=10"></script>
     <script src="../js/cursor.js"></script>
 </body>
 

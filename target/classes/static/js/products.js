@@ -9,6 +9,36 @@ document.addEventListener('DOMContentLoaded', () => {
 let currentProducts = [...products]; // Copy of global data
 
 function initShop() {
+    // 1. First fetch products from real DB to keep Store and Admin panel synchronized!
+    try {
+        productAPI.getAll().then(dbProducts => {
+            if (dbProducts && dbProducts.length > 0) {
+                // Map the DB backend models strictly securely over to Frontend array models
+                window.products = dbProducts.map(p => ({
+                    id: p.id || p._id,
+                    name: p.name,
+                    category: p.category,
+                    brand: p.brand,
+                    price: p.price,
+                    rating: p.rating || 4.5,
+                    image: p.imageUrl || p.image,
+                    desc: p.description
+                }));
+                currentProducts = [...window.products];
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                const categoryParam = urlParams.get('category');
+                if (categoryParam) {
+                    const checkboxes = document.querySelectorAll(`input[name="category"][value="${capitalize(categoryParam)}"]`);
+                    checkboxes.forEach(cb => { cb.checked = true; });
+                    filterProducts();
+                } else {
+                    renderProducts(currentProducts);
+                }
+            }
+        });
+    } catch(e) { console.error("Could not sync with Backend. Using local Fallback data.", e); }
+
     // Check for URL query params (e.g. ?category=electronics)
     const urlParams = new URLSearchParams(window.location.search);
     const categoryParam = urlParams.get('category');
@@ -91,7 +121,7 @@ function renderProducts(items) {
             <div class="product-img-wrapper" onclick="window.location.href='product.html?id=${product.id}'">
                 <img src="${product.image}" alt="${product.name}" class="product-img">
                 <div class="product-actions">
-                    <button class="action-btn" onclick="addToCart(event, ${product.id})" title="Add to Cart"><i class="fa-solid fa-plus"></i></button>
+                    <button class="action-btn" onclick="addToCart(event, '${product.id}')" title="Add to Cart"><i class="fa-solid fa-plus"></i></button>
                     <button class="action-btn" onclick="window.location.href='product.html?id=${product.id}'" title="View Details"><i class="fa-regular fa-eye"></i></button>
                 </div>
             </div>
@@ -101,7 +131,7 @@ function renderProducts(items) {
                     <span class="product-price">₹${product.price}</span>
                     <span style="font-size: 0.8rem; color: #666;">${product.rating} <i class="fa-solid fa-star" style="color: gold;"></i></span>
                 </div>
-                <button class="btn-buy-now" onclick="buyNow(${product.id})">Buy Now</button>
+                <button class="btn-buy-now" onclick="buyNow('${product.id}')">Buy Now</button>
             </div>
         `;
         grid.appendChild(card);
@@ -113,51 +143,86 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function findProductById(id) {
+    const allProducts = (Array.isArray(currentProducts) && currentProducts.length > 0)
+        ? currentProducts
+        : (Array.isArray(window.products) ? window.products : products);
+
+    return allProducts.find(p => String(p.id) === String(id));
+}
+
 // Add to Cart global function
-window.addToCart = function (e, id) {
+window.addToCart = async function (e, id) {
     if (e) e.stopPropagation(); // Prevent card click
 
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existing = cart.find(item => item.id === id);
-
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        cart.push({ ...product, quantity: 1 });
+    if (typeof isAuthenticated !== 'undefined' && !isAuthenticated()) {
+        const product = findProductById(id);
+        if (product) {
+            localStorage.setItem('pendingCartAction', JSON.stringify({
+                productId: id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                redirect: window.location.pathname + window.location.search
+            }));
+        }
+        window.location.href = `login.html`;
+        return;
     }
 
-    localStorage.setItem('cart', JSON.stringify(cart));
+    const product = findProductById(id);
+    if (!product) return;
 
-    // Update UI
-    updateCartCount(); // key function in main.js
+    try {
+        await cartAPI.addToCart(id, 1, product.name, product.price, product.image);
 
-    // Show Toast
-    const toast = document.getElementById('toast');
-    toast.innerText = `Added ${product.name} to cart`;
-    toast.classList.remove('hidden');
-    toast.style.opacity = 1;
-    setTimeout(() => {
-        toast.style.opacity = 0;
-        setTimeout(() => toast.classList.add('hidden'), 300);
-    }, 3000);
+        // Update UI
+        updateCartCount(); // key function in main.js
+
+        // Show Toast
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.innerText = `Added ${product.name} to cart`;
+            toast.classList.remove('hidden');
+            toast.style.opacity = 1;
+            setTimeout(() => {
+                toast.style.opacity = 0;
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+    } catch(err) {
+        console.error('Error adding to cart:', err);
+        alert('Failed to add to cart');
+    }
 }
 
 // Buy Now function
-window.buyNow = function (id) {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-
-    // Add 1 to cart if not present, then redirect
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existing = cart.find(item => item.id === id);
-
-    if (!existing) {
-        cart.push({ ...product, quantity: 1 });
-        localStorage.setItem('cart', JSON.stringify(cart));
+window.buyNow = async function (id) {
+    if (typeof isAuthenticated !== 'undefined' && !isAuthenticated()) {
+        const product = findProductById(id);
+        if (product) {
+            localStorage.setItem('pendingCartAction', JSON.stringify({
+                productId: id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                redirect: 'checkout.html'
+            }));
+        }
+        window.location.href = `login.html`;
+        return;
     }
 
-    window.location.href = 'checkout.html';
+    const product = findProductById(id);
+    if (!product) return;
+
+    try {
+        document.body.style.cursor = 'wait';
+        await cartAPI.addToCart(id, 1, product.name, product.price, product.image);
+        window.location.href = 'checkout.html';
+    } catch(err) {
+        document.body.style.cursor = 'default';
+        console.error('Buy Now error:', err);
+        alert('Failed to proceed to checkout');
+    }
 }
